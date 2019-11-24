@@ -37,7 +37,37 @@ function writelog([string]$result, [string]$logfile) {
         Write-Host $result -foregroundcolor red
         $error.clear()
    }
-} 
+}
+
+function setRegistryDWORD([string]$PathKey, [string]$regDWORDKey, [string]$regDWORDName, [int]$regDWORDValue , [string]$logfile)
+{
+    try 
+    {
+      If(testRegKeyPath $PathKey) {
+            $pushd = pushd -Path C:\
+            $PathKey = $regDWORDKey
+            Set-Location -path $PathKey; Set-ItemProperty -Path $regDWORDKey -Name $regDWORDName -Value $regDWORDValue -Type DWord -ErrorAction SilentlyContinue
+            popd
+            }
+      else {
+            new-Item -Path $PathKey | Out-Null -ErrorAction SilentlyContinue
+            New-ItemProperty -Path $PathKey -Name $regDWORDName -PropertyType DWord -Value $regDWORDValue | Out-Null -ErrorAction SilentlyContinue
+    }
+    }
+    Catch
+    {
+        writelog "ERROR: $Error[0]" $log 
+        $Error[0] 
+        Exit -1
+    }        
+}
+
+function testRegKeyPath([string]$regpath)
+{
+    Test-Path $regpath
+}
+
+
 
 $log = "Align_Cryto_Policy.log"
 
@@ -160,43 +190,38 @@ If($SetDefaultCiphers){
 
 If($DisableSSLv3Client){
     #Disable SSL 3.0 Client
-    New-Item $SSL3 -Force | Out-Null -ErrorAction Stop
-    New-ItemProperty -Path $SSL3 -Name 'DisabledByDefault' -Value 1 -PropertyType 'DWord' -Force | Out-Null -ErrorAction Stop
-    New-ItemProperty -Path $SSL3 -Name 'Enabled' -Value 0 -PropertyType 'DWord' -Force | Out-Null -ErrorAction Stop
+    setRegistryDWORD $SSL3 $SSL3 'DisabledByDefault' '1'
+    setRegistryDWORD $SSL3 $SSL3 'Enabled' '0'
     writelog "SSL 3.0 Client now disabled" $log
 }
 
 #-------------------------------------------------------------------------------
 If($DisableSSLv3Server){
     #Disable SSL 3.0 Server
-    New-Item $SSL3Server -Force | Out-Null -ErrorAction Stop
-    New-ItemProperty -Path $SSL3Server -Name 'DisabledByDefault' -Value 1 -PropertyType 'DWord' -Force | Out-Null -ErrorAction Stop
-    New-ItemProperty -Path $SSL3Server -Name 'Enabled' -Value 0 -PropertyType 'DWord' -Force | Out-Null -ErrorAction Stop
+    setRegistryDWORD $SSL3Server $SSL3Server 'DisabledByDefault' '1'
+    setRegistryDWORD $SSL3Server $SSL3Server 'Enabled' '0'
     writelog "SSL 3.0 Server now disabled" $log
 }
 #--------------------------------------------------------------------------------
 If($EnableSSLv1){
     #Enable SSL 1.0
     writelog "Ensuring TLS 1.0 is enabled" $log
-    New-Item $TLS10 -Force | Out-Null -ErrorAction SilentlyContinue
-    New-ItemProperty -Path $TLS10 -Name 'Enabled' -Value 1 -PropertyType 'DWord' -Force | Out-Null -ErrorAction SilentlyContinue
-    New-ItemProperty -Path $TLS10 -Name 'DisabledByDefault' -Value 0 -PropertyType 'DWord' -Force | Out-Null -ErrorAction SilentlyContinue
+    setRegistryDWORD $TLS10 $TLS10 'DisabledByDefault' '0'
+    setRegistryDWORD $TLS10 $TLS10 'Enabled' '1'
 }
 
 If($EnableSSLv11){
     #Enable SSL 1.1
     writelog "Ensuring TLS 1.1 is enabled" $log
-    New-Item $TLS11 -Force | Out-Null -ErrorAction SilentlyContinue
-    New-ItemProperty -Path $TLS11 -Name 'Enabled' -Value 1 -PropertyType 'DWord' -Force | Out-Null -ErrorAction SilentlyContinue
-    New-ItemProperty -Path $TLS11 -Name 'DisabledByDefault' -Value 0 -PropertyType 'DWord' -Force | Out-Null -ErrorAction SilentlyContinue
+    setRegistryDWORD $TLS11 $TLS11 'DisabledByDefault' '0'
+    setRegistryDWORD $TLS11 $TLS11 'Enabled' '1'
 }
 
 If($EnableSSLv12){
     #Enable SSL 1.2
     writelog "Ensuring TLS 1.2 is enabled" $log
-    New-Item $TLS12 -Force | Out-Null -ErrorAction SilentlyContinue
-    New-ItemProperty -Path $TLS12 -Name 'Enabled' -Value 1 -PropertyType 'DWord' -Force | Out-Null -ErrorAction SilentlyContinue
-    New-ItemProperty -Path $TLS12 -Name 'DisabledByDefault' -Value 0 -PropertyType 'DWord' -Force | Out-Null -ErrorAction SilentlyContinue
+    setRegistryDWORD $TLS12 $TLS12 'DisabledByDefault' '0'
+    setRegistryDWORD $TLS12 $TLS12 'Enabled' '1'
 }
 
 writelog "$ScriptName Script ended" $log
