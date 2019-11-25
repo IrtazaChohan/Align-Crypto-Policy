@@ -4,7 +4,7 @@
 # AUTHOR:  Irtaza Chohan
 # 
 # COMMENT:  Script to align cryptography across baseline.
-#           This script will disable TLS 1.0 and set the cipher order as per below
+#           This script will disable TLS 1.0 and set the cipher order as per below.
 #
 # VERSION HISTORY
 # 1.0 <DATE> Initial Version.
