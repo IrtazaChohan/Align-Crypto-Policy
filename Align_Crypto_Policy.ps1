@@ -1,24 +1,10 @@
-﻿# #############################################################################
-# NAME: Align_Cryto_Policy.ps1
-# 
-# AUTHOR:  Irtaza Chohan
-# 
-# COMMENT:  Script to align cryptography across baseline.
-#           This script will disable TLS 1.0 and set the cipher order as per below.
-#
-# VERSION HISTORY
-# 1.0 <DATE> Initial Version.
-# 2.0 24/11/2019 Updated script to accept parameters to meet various configurations
-# 2.1 25/11/2019 Added in help section
-# #############################################################################
-
-<#
+﻿<#
 
 .SYNOPSIS
 
-This script configures a server to align with best practice crptography levels. 
+This script configures a server to align with best practice crptography levels.
 
-Written by Irtaza Chohan.
+Written by Irtaza Chohan (www.lostintheclouds.net & https://github.com/IrtazaChohan/Align-Crypto-Policy)
 
 .DESCRIPTION
 
@@ -154,7 +140,7 @@ https://github.com/IrtazaChohan/Align-Crypto-Policy
 param (
     
         [Parameter(Mandatory=$True,
-        HelpMessage="Please view the help for this script; type in ""help Align_Crypto_Policy.ps1""")]
+        HelpMessage="Please view the help for this script; type in ""get-help <scriptname>.ps1""")]
         [string]$LogFilePath,
         [Parameter(Mandatory=$true)]
         [string]$RegistryExportPath,
@@ -189,7 +175,7 @@ function setRegistryDWORD([string]$PathKey, [string]$regDWORDKey, [string]$regDW
             popd
             }
       else {
-            new-Item -Path $PathKey | Out-Null -ErrorAction SilentlyContinue
+            new-Item -Path $PathKey -Force | Out-Null -ErrorAction SilentlyContinue
             New-ItemProperty -Path $PathKey -Name $regDWORDName -PropertyType DWord -Value $regDWORDValue | Out-Null -ErrorAction SilentlyContinue
     }
     }
@@ -365,5 +351,3 @@ If($EnableSSLv12){
 
 writelog "$ScriptName Script ended" $log
 writelog "==============================================" $log
-
-#>
